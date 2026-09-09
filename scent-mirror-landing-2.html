@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scent Mirror — Find the fragrance that matches you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,450;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1D1128;
+    --ink-soft: #2C1B3D;
+    --parchment: #FBF3E7;
+    --parchment-dim: #EDDFC9;
+    --amber: #F2A93C;
+    --wine: #C4436B;
+    --line: rgba(251, 243, 231, 0.16);
+    --line-dark: rgba(29, 17, 40, 0.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Work Sans', sans-serif;
+    background: var(--parchment);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Fraunces', serif;
+    font-weight: 450;
+    letter-spacing: -0.01em;
+  }
+
+  a { color: inherit; }
+  img, svg { display: block; max-width: 100%; }
+  button { font-family: inherit; }
+
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 32px; }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--ink); border-bottom: 1px solid var(--line);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; }
+  .logo { font-family: 'Fraunces', serif; font-size: 22px; color: var(--parchment); font-weight: 500; }
+  .logo em { font-style: italic; color: var(--amber); }
+  .nav-links { display: flex; gap: 36px; font-size: 15px; color: var(--parchment-dim); align-items: center; }
+  .nav-links a { text-decoration: none; }
+  .nav-links a:hover { color: var(--amber); }
+  .nav-cta {
+    border: 1px solid var(--amber); color: var(--amber) !important;
+    padding: 8px 18px; border-radius: 999px; font-size: 14px;
+    background: transparent; cursor: pointer;
+  }
+  .nav-cta:hover { background: var(--amber); color: var(--ink) !important; }
+  @media (max-width: 720px) { .nav-links a:not(.nav-cta) { display: none; } }
+
+  /* ---------- Hero ---------- */
+  .hero { background: var(--ink); color: var(--parchment); padding: 96px 0 110px; position: relative; overflow: hidden; }
+  .hero .wrap { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; }
+  .hero h1 { font-size: clamp(40px, 5vw, 62px); line-height: 1.05; opacity: 0; animation: rise 0.9s 0.15s ease forwards; }
+  .hero p.lede { margin-top: 24px; font-size: 18px; color: var(--parchment-dim); max-width: 46ch; opacity: 0; animation: rise 0.9s 0.35s ease forwards; }
+  .hero-ctas { margin-top: 36px; display: flex; gap: 16px; flex-wrap: wrap; opacity: 0; animation: rise 0.9s 0.5s ease forwards; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  .btn {
+    display: inline-block; padding: 14px 26px; border-radius: 999px;
+    font-size: 15px; font-weight: 500; text-decoration: none;
+    transition: transform 0.15s ease; border: none; cursor: pointer;
+  }
+  .btn-primary { background: var(--amber); color: var(--ink); }
+  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-ghost { border: 1px solid var(--line); color: var(--parchment); background: transparent; }
+  .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+
+  .constellation { position: relative; width: 100%; aspect-ratio: 1 / 1; }
+  .node circle { transition: r 0.25s ease, fill-opacity 0.25s ease; }
+  .node:hover circle { fill-opacity: 1; }
+  .node .trait { opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
+  .node:hover .trait { opacity: 1; }
+
+  /* ---------- How it works ---------- */
+  .steps { padding: 100px 0; }
+  .section-head { max-width: 56ch; margin-bottom: 56px; }
+  .section-head h2 { font-size: clamp(28px, 3.4vw, 38px); line-height: 1.15; }
+  .section-head p { margin-top: 16px; font-size: 17px; color: #4A3C31; }
+
+  .step-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  .step { border-top: 2px solid var(--wine); padding-top: 22px; }
+  .step .num { font-family: 'Fraunces', serif; font-size: 15px; color: var(--wine); margin-bottom: 14px; }
+  .step h3 { font-size: 21px; font-weight: 500; margin-bottom: 10px; }
+  .step p { color: #4A3C31; font-size: 15.5px; }
+
+  @media (max-width: 800px) {
+    .step-list { grid-template-columns: 1fr; }
+    .hero .wrap { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Founder / consultant section ---------- */
+  .consult { background: var(--ink-soft); color: var(--parchment); padding: 100px 0; }
+  .consult .wrap { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 56px; align-items: center; }
+  .consult-card { border: 1px solid var(--line); border-radius: 4px; padding: 32px; background: rgba(251,243,231,0.04); border-left: 3px solid var(--amber); }
+  .consult-card .role { font-size: 13px; color: var(--amber); margin-bottom: 6px; }
+  .consult-card h3 { font-size: 24px; font-weight: 500; margin-bottom: 14px; }
+  .consult-card p { color: var(--parchment-dim); font-size: 15.5px; }
+
+  .consult-copy h2 { font-size: clamp(28px, 3.4vw, 36px); line-height: 1.18; margin-bottom: 20px; }
+  .consult-copy p { color: var(--parchment-dim); font-size: 17px; max-width: 52ch; }
+  .consult-copy p + p { margin-top: 16px; }
+
+  /* ---------- Families strip ---------- */
+  .families { padding: 90px 0; }
+  .family-grid { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--line-dark); border-left: 1px solid var(--line-dark); }
+  .family {
+    border-right: 1px solid var(--line-dark); border-bottom: 1px solid var(--line-dark);
+    padding: 28px 22px; min-height: 168px; display: flex; flex-direction: column; justify-content: space-between;
+    transition: background 0.2s ease;
+  }
+  .family:hover { background: rgba(196,67,105,0.06); }
+  .family .name { font-family: 'Fraunces', serif; font-size: 19px; color: var(--wine); }
+  .family .trait-line { font-size: 13.5px; color: #6B5C4C; }
+  @media (max-width: 900px) { .family-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ---------- CTA / waitlist ---------- */
+  .cta-band { background: var(--wine); color: var(--parchment); padding: 90px 0; text-align: center; }
+  .cta-band h2 { font-size: clamp(30px, 4vw, 44px); max-width: 20ch; margin: 0 auto 20px; }
+  .cta-band p { color: rgba(251,243,231,0.85); font-size: 17px; margin-bottom: 34px; }
+  .waitlist-form { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; max-width: 480px; margin: 0 auto; }
+  .waitlist-form input {
+    flex: 1; min-width: 220px; padding: 14px 18px; border-radius: 999px;
+    border: 1px solid rgba(251,243,231,0.4); background: transparent; color: var(--parchment);
+    font-size: 15px; font-family: 'Work Sans', sans-serif;
+  }
+  .waitlist-form input::placeholder { color: rgba(251,243,231,0.6); }
+  .waitlist-form input:focus, .btn:focus, a:focus, .node:focus, button:focus { outline: 2px solid var(--amber); outline-offset: 2px; }
+  .waitlist-note { margin-top: 16px; font-size: 13px; color: rgba(251,243,231,0.65); }
+  .form-success { display: none; font-size: 15px; color: var(--amber); margin-top: 18px; }
+
+  /* ---------- Footer ---------- */
+  footer { background: var(--ink); color: var(--parchment-dim); padding: 48px 0; }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; font-size: 14px; }
+  footer .logo { font-size: 18px; }
+
+  /* ---------- Quiz modal ---------- */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(29,17,40,0.72);
+    z-index: 50; align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--parchment); color: var(--ink); border-radius: 8px;
+    max-width: 520px; width: 100%; padding: 40px; position: relative;
+    border-top: 4px solid var(--amber);
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 18px; background: none; border: none;
+    font-size: 22px; color: #6B5C4C; cursor: pointer; line-height: 1;
+  }
+  .modal-close:hover { color: var(--wine); }
+  .modal-progress { font-size: 13px; color: var(--wine); margin-bottom: 10px; }
+  .modal h3 { font-size: 24px; margin-bottom: 22px; line-height: 1.25; }
+  .modal-options { display: flex; flex-direction: column; gap: 10px; }
+  .modal-options button {
+    text-align: left; padding: 14px 18px; border-radius: 6px;
+    border: 1px solid var(--line-dark); background: transparent; color: var(--ink);
+    font-size: 15px; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .modal-options button:hover { border-color: var(--wine); background: rgba(196,67,105,0.06); }
+  .modal-result { text-align: center; }
+  .modal-result .family-name { font-family: 'Fraunces', serif; font-size: 32px; color: var(--wine); margin: 10px 0 14px; }
+  .modal-result p { color: #4A3C31; font-size: 15.5px; margin-bottom: 26px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero h1, .hero p.lede, .hero-ctas { animation: none; opacity: 1; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">Scent <em>Mirror</em></div>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#consult">The consultation</a>
+      <a href="#families">Scent families</a>
+      <button class="nav-cta" onclick="openQuiz()">Take the quiz</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <h1 class="display">A fragrance should sound like you before it smells like anything.</h1>
+      <p class="lede">Scent Mirror reads your personality, not just your preferences, then puts you in a real conversation with our consultant to land on the one fragrance that's actually yours.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-primary" onclick="openQuiz()">Take the quiz</button>
+        <a href="#consult" class="btn btn-ghost">Meet the consultant</a>
+      </div>
+    </div>
+    <div>
+      <svg class="constellation" viewBox="0 0 420 420" role="img" aria-label="Five scent families, each linked to a personality trait">
+        <line x1="210" y1="210" x2="210" y2="50" stroke="rgba(251,243,231,0.14)"/>
+        <line x1="210" y1="210" x2="368" y2="160" stroke="rgba(251,243,231,0.14)"/>
+        <line x1="210" y1="210" x2="295" y2="370" stroke="rgba(251,243,231,0.14)"/>
+        <line x1="210" y1="210" x2="125" y2="370" stroke="rgba(251,243,231,0.14)"/>
+        <line x1="210" y1="210" x2="52" y2="160" stroke="rgba(251,243,231,0.14)"/>
+
+        <g class="node" tabindex="0">
+          <circle cx="210" cy="210" r="46" fill="#F2A93C" fill-opacity="0.95"/>
+          <text x="210" y="215" text-anchor="middle" font-size="14" fill="#1D1128" font-weight="600">You</text>
+        </g>
+
+        <g class="node" tabindex="0">
+          <circle cx="210" cy="50" r="32" fill="#C4436B" fill-opacity="0.85"/>
+          <text x="210" y="55" text-anchor="middle" font-size="12" fill="#FBF3E7">Amber</text>
+          <text class="trait" x="210" y="24" text-anchor="middle" font-size="11" fill="#F2A93C">warm, grounded</text>
+        </g>
+
+        <g class="node" tabindex="0">
+          <circle cx="368" cy="160" r="32" fill="#C4436B" fill-opacity="0.85"/>
+          <text x="368" y="165" text-anchor="middle" font-size="12" fill="#FBF3E7">Woody</text>
+          <text class="trait" x="352" y="132" text-anchor="middle" font-size="11" fill="#F2A93C">quiet confidence</text>
+        </g>
+
+        <g class="node" tabindex="0">
+          <circle cx="295" cy="370" r="32" fill="#C4436B" fill-opacity="0.85"/>
+          <text x="295" y="375" text-anchor="middle" font-size="12" fill="#FBF3E7">Spice</text>
+          <text class="trait" x="295" y="405" text-anchor="middle" font-size="11" fill="#F2A93C">bold, unpredictable</text>
+        </g>
+
+        <g class="node" tabindex="0">
+          <circle cx="125" cy="370" r="32" fill="#C4436B" fill-opacity="0.85"/>
+          <text x="125" y="375" text-anchor="middle" font-size="12" fill="#FBF3E7">Floral</text>
+          <text class="trait" x="125" y="405" text-anchor="middle" font-size="11" fill="#F2A93C">expressive, open</text>
+        </g>
+
+        <g class="node" tabindex="0">
+          <circle cx="52" cy="160" r="32" fill="#C4436B" fill-opacity="0.85"/>
+          <text x="52" y="165" text-anchor="middle" font-size="12" fill="#FBF3E7">Citrus</text>
+          <text class="trait" x="68" y="132" text-anchor="middle" font-size="11" fill="#F2A93C">bright energy</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<section class="steps" id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="display">Three steps between you and your signature scent</h2>
+      <p>No overwhelming wall of bottles. Just a profile, a conversation, and a match you can explain in one sentence.</p>
+    </div>
+    <div class="step-list">
+      <div class="step">
+        <div class="num">01</div>
+        <h3>Answer the profile quiz</h3>
+        <p>A short set of questions about how you move through a room, not what you already think you smell like.</p>
+      </div>
+      <div class="step">
+        <div class="num">02</div>
+        <h3>Talk it through with the consultant</h3>
+        <p>Your results open a live chat where you can push back, ask questions, and refine the match in your own words.</p>
+      </div>
+      <div class="step">
+        <div class="num">03</div>
+        <h3>Get your match, with reasoning</h3>
+        <p>You leave with a recommendation and the why behind it — which notes, and which part of your personality they're echoing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="consult" id="consult">
+  <div class="wrap">
+    <div class="consult-card">
+      <div class="role">Founder & CEO, Scent Mirror</div>
+      <h3 class="display">Mimidoo Faith Aka</h3>
+      <p>Every consultation is trained on how Mimidoo herself approaches a match — so the chat you get isn't a generic bot, it's her method, available on demand.</p>
+    </div>
+    <div class="consult-copy">
+      <h2 class="display">You're not filling out a form. You're in a conversation.</h2>
+      <p>Most fragrance quizzes stop at a results page. Scent Mirror opens a real back-and-forth instead — you can disagree with a suggestion, explain why a note felt wrong last time, or describe a moment you want a scent to belong to.</p>
+      <p>The consultant asks follow-up questions the way a good in-store expert would, then narrows toward a fragrance family and, eventually, a bottle.</p>
+    </div>
+  </div>
+</section>
+
+<section class="families" id="families">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="display">Five families, one of them is you</h2>
+      <p>Every match traces back to a scent family and the trait it tends to sit alongside.</p>
+    </div>
+    <div class="family-grid">
+      <div class="family"><span class="name display">Amber</span><span class="trait-line">warm, grounded</span></div>
+      <div class="family"><span class="name display">Woody</span><span class="trait-line">steady, quiet confidence</span></div>
+      <div class="family"><span class="name display">Spice</span><span class="trait-line">bold, a little unpredictable</span></div>
+      <div class="family"><span class="name display">Floral</span><span class="trait-line">expressive, open</span></div>
+      <div class="family"><span class="name display">Citrus</span><span class="trait-line">quick, bright energy</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band" id="join">
+  <div class="wrap">
+    <h2 class="display">Your match is one conversation away.</h2>
+    <p>Join the waitlist and we'll let you know the moment your consultation opens.</p>
+    <form class="waitlist-form" id="waitlistForm">
+      <input type="email" placeholder="you@email.com" required aria-label="Email address">
+      <button type="submit" class="btn btn-primary">Join waitlist</button>
+    </form>
+    <p class="form-success" id="formSuccess">You're on the list — we'll be in touch.</p>
+    <p class="waitlist-note">No spam. Just a note when your spot is ready.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo display">Scent <em>Mirror</em></div>
+    <div>&copy; 2026 Scent Mirror. Founded by Mimidoo Faith Aka.</div>
+  </div>
+</footer>
+
+<!-- Quiz modal -->
+<div class="modal-overlay" id="quizOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeQuiz()" aria-label="Close quiz">&times;</button>
+    <div id="quizBody"></div>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    {
+      q: "Walking into a room, you'd rather people noticed:",
+      opts: [
+        { text: "That I'm comfortable, not that I tried hard", family: "Woody" },
+        { text: "That something about me feels warm and familiar", family: "Amber" },
+        { text: "My energy before anything else", family: "Citrus" },
+        { text: "That I clearly did something different", family: "Spice" }
+      ]
+    },
+    {
+      q: "A compliment you'd actually want to hear:",
+      opts: [
+        { text: "'You always seem so put together.'", family: "Woody" },
+        { text: "'Being around you feels easy.'", family: "Amber" },
+        { text: "'You lit up the whole room.'", family: "Citrus" },
+        { text: "'I did not expect that from you.'", family: "Spice" },
+        { text: "'You always feel a bit generous, open.'", family: "Floral" }
+      ]
+    },
+    {
+      q: "Your ideal Saturday:",
+      opts: [
+        { text: "Quiet, deliberate, alone if possible", family: "Woody" },
+        { text: "Slow morning, good coffee, familiar people", family: "Amber" },
+        { text: "Packed with plans and people", family: "Citrus" },
+        { text: "Whatever comes up, no plan at all", family: "Spice" },
+        { text: "Somewhere outside, flowers, a market", family: "Floral" }
+      ]
+    },
+    {
+      q: "When you disagree with someone, you tend to:",
+      opts: [
+        { text: "Say it plainly and hold your ground", family: "Spice" },
+        { text: "Think it through before saying anything", family: "Woody" },
+        { text: "Find the warm way to say the hard thing", family: "Amber" },
+        { text: "Say exactly what you feel, right away", family: "Citrus" },
+        { text: "Try to understand their side first", family: "Floral" }
+      ]
+    }
+  ];
+
+  const familyDetail = {
+    Woody: "steady, quiet confidence — sandalwood, cedar, vetiver",
+    Amber: "warm, grounded — amber resin, vanilla, soft musk",
+    Citrus: "quick, bright energy — bergamot, grapefruit, mandarin",
+    Spice: "bold, a little unpredictable — pink pepper, cardamom, clove",
+    Floral: "expressive, open — jasmine, rose, orange blossom"
+  };
+
+  let current = 0;
+  let scores = {};
+
+  function openQuiz() {
+    current = 0;
+    scores = {};
+    document.getElementById('quizOverlay').classList.add('open');
+    renderQuestion();
+  }
+
+  function closeQuiz() {
+    document.getElementById('quizOverlay').classList.remove('open');
+  }
+
+  document.getElementById('quizOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeQuiz();
+  });
+
+  function renderQuestion() {
+    const body = document.getElementById('quizBody');
+    const item = questions[current];
+    let html = '<div class="modal-progress">Question ' + (current + 1) + ' of ' + questions.length + '</div>';
+    html += '<h3 class="display">' + item.q + '</h3>';
+    html += '<div class="modal-options">';
+    item.opts.forEach(function(opt, i) {
+      html += '<button onclick="answer(\'' + opt.family + '\')">' + opt.text + '</button>';
+    });
+    html += '</div>';
+    body.innerHTML = html;
+  }
+
+  function answer(family) {
+    scores[family] = (scores[family] || 0) + 1;
+    current++;
+    if (current < questions.length) {
+      renderQuestion();
+    } else {
+      renderResult();
+    }
+  }
+
+  function renderResult() {
+    let top = null, topScore = -1;
+    for (const fam in scores) {
+      if (scores[fam] > topScore) { top = fam; topScore = scores[fam]; }
+    }
+    const body = document.getElementById('quizBody');
+    body.innerHTML =
+      '<div class="modal-result">' +
+      '<div class="modal-progress">Your starting point</div>' +
+      '<div class="family-name display">' + top + '</div>' +
+      '<p>' + familyDetail[top] + '. That\'s the family to start from — the consultant will narrow it to an actual bottle once your consultation opens.</p>' +
+      '<button class="btn btn-primary" onclick="closeQuiz(); document.getElementById(\'join\').scrollIntoView({behavior:\'smooth\'});">Join the waitlist</button>' +
+      '</div>';
+  }
+
+  // --- Supabase config ---
+  // Replace these two with your own project's values (Project Settings > API in Supabase)
+  const SUPABASE_URL = 'https://pbguubmqhzxggruvxvgi.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_VzRRprUfmpCJf_gVU6Wwcg_m9NBA9vV';
+
+  const form = document.getElementById('waitlistForm');
+  const success = document.getElementById('formSuccess');
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = form.querySelector('input[type="email"]').value.trim();
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Joining...';
+
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/Waitlist', {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ email: email })
+      });
+
+      if (res.ok) {
+        form.style.display = 'none';
+        success.style.display = 'block';
+      } else if (res.status === 409) {
+        // unique constraint on email — already on the list
+        form.style.display = 'none';
+        success.textContent = "You're already on the list.";
+        success.style.display = 'block';
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Join waitlist';
+        alert('Something went wrong — please try again.');
+      }
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Join waitlist';
+      alert('Could not reach the server — check your connection and try again.');
+    }
+  });
+</script>
+
+</body>
+</html>
